@@ -1,0 +1,30 @@
+<configuration>
+    <!-- Appender ghi log ra console -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Appender ghi log ra file mail.log -->
+    <appender name="MAILFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/mail.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/mail.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Chỉ log riêng package MailDispatchJob vào mail.log -->
+    <logger name="demo.autosendmail.quartz.MailDispatchJob" level="DEBUG" additivity="false">
+        <appender-ref ref="MAILFILE"/>
+    </logger>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
