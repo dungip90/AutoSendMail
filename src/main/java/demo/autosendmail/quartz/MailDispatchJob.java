@@ -38,11 +38,18 @@ public class MailDispatchJob implements Job {
 
         for (MailQueue mq : pending) {
             try {
-                mailService.sendPlainText(mq.getRecipient(), mq.getSubject(), mq.getBody());
+                // gửi cho nhiều người + cc
+                mailService.sendPlainText(
+                        mq.getRecipients(),
+                        mq.getCcRecipients(),
+                        mq.getSubject(),
+                        mq.getBody()
+                );
 
                 MailHistory h = new MailHistory();
                 h.setQueueId(mq.getId());
-                h.setRecipient(mq.getRecipient());
+                h.setRecipients(mq.getRecipients());
+                h.setCcRecipients(mq.getCcRecipients());
                 h.setSubject(mq.getSubject());
                 h.setBody(mq.getBody());
                 h.setSentAt(Instant.now());
@@ -52,8 +59,7 @@ public class MailDispatchJob implements Job {
 
                 queueRepo.deleteById(mq.getId());
             } catch (Exception ex) {
-                // Ghi log lỗi chi tiết
-                log.error("Mail send failed to {}: {}", mq.getRecipient(), ex.getMessage(), ex);
+                log.error("Mail send failed to {}: {}", mq.getRecipients(), ex.getMessage(), ex);
 
                 mq.setAttempts(mq.getAttempts() + 1);
                 mq.setStatus("FAILED");
@@ -62,14 +68,14 @@ public class MailDispatchJob implements Job {
 
                 MailHistory h = new MailHistory();
                 h.setQueueId(mq.getId());
-                h.setRecipient(mq.getRecipient());
+                h.setRecipients(mq.getRecipients());
+                h.setCcRecipients(mq.getCcRecipients());
                 h.setSubject(mq.getSubject());
                 h.setBody(mq.getBody());
                 h.setSentAt(Instant.now());
                 h.setStatus("FAILED");
                 h.setError(ex.getMessage());
                 historyRepo.save(h);
-
             }
         }
     }

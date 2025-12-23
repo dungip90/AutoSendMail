@@ -11,4 +11,6 @@ public interface MailQueueRepository extends JpaRepository<MailQueue, Long> {
             "WHERE m.status = 'PENDING' " +
             "AND (m.scheduledAt IS NULL OR m.scheduledAt <= :now)")
     List<MailQueue> findReadyToSend(Instant now);
+
+    List<MailQueue> findByStatus(String pending);
 }
